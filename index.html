@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roast Me 🔥</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0e0d0c;
+      --surface: #1a1917;
+      --surface2: #242220;
+      --border: rgba(255,255,255,0.08);
+      --text: #f0ede8;
+      --muted: #888580;
+      --accent-light: #f5c842;
+      --accent-med: #f07030;
+      --accent-savage: #e8303a;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --radius: 12px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 4rem;
+    }
+
+    header { text-align: center; margin-bottom: 2.5rem; }
+
+    .tagline {
+      font-family: var(--font-display);
+      font-size: clamp(3.5rem, 10vw, 7rem);
+      letter-spacing: 0.04em;
+      line-height: 0.9;
+      background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent-med) 50%, var(--accent-savage) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      margin-top: 0.6rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      width: 100%;
+      max-width: 620px;
+    }
+
+    .meter-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .meter-track {
+      position: relative;
+      height: 8px;
+      background: var(--surface2);
+      border-radius: 99px;
+      margin-bottom: 0.5rem;
+      overflow: visible;
+    }
+
+    .meter-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1), background 0.5s;
+      width: 16.5%;
+      background: var(--accent-light);
+    }
+
+    .meter-knob {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 20px;
+      height: 20px;
+      background: var(--text);
+      border-radius: 50%;
+      cursor: pointer;
+      left: 16.5%;
+      transition: left 0.5s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
+      box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--accent-light);
+      z-index: 2;
+    }
+
+    .meter-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    .meter-labels button {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      padding: 0.3rem 0.85rem;
+      border-radius: 99px;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.04em;
+    }
+
+    .meter-labels button:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+    .meter-labels button.active-light  { background: rgba(245,200,66,0.15); border-color: var(--accent-light); color: var(--accent-light); }
+    .meter-labels button.active-medium { background: rgba(240,112,48,0.15); border-color: var(--accent-med);   color: var(--accent-med);   }
+    .meter-labels button.active-savage { background: rgba(232,48,58,0.15);  border-color: var(--accent-savage); color: var(--accent-savage); }
+
+    .field-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      padding: 0.85rem 1rem;
+      resize: vertical;
+      min-height: 110px;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 1rem;
+    }
+
+    textarea:focus { border-color: rgba(255,255,255,0.25); }
+    textarea::placeholder { color: var(--muted); }
+
+    .roast-btn {
+      width: 100%;
+      padding: 0.9rem;
+      border: none;
+      border-radius: 8px;
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.2s, background 0.4s;
+      background: var(--accent-light);
+      color: #1a1200;
+    }
+
+    .roast-btn:hover:not(:disabled) { transform: translateY(-2px); }
+    .roast-btn:active:not(:disabled) { transform: scale(0.98); }
+    .roast-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .roast-btn.heat-medium { background: var(--accent-med); color: #fff; }
+    .roast-btn.heat-savage { background: var(--accent-savage); color: #fff; }
+
+    .result-box {
+      margin-top: 1.5rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      display: none;
+      position: relative;
+    }
+
+    .result-box.visible { display: block; }
+
+    .result-heat-bar {
+      height: 3px;
+      border-radius: 99px;
+      margin-bottom: 1rem;
+      background: var(--accent-light);
+      transition: background 0.4s;
+    }
+
+    .result-text {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+
+    .result-copy {
+      position: absolute;
+      top: 0.85rem;
+      right: 1rem;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-family: var(--font-body);
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .result-copy:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+
+    .heat-display {
+      font-size: 1.1rem;
+      text-align: center;
+      height: 1.4rem;
+      letter-spacing: -0.02em;
+      transition: all 0.4s;
+      margin-bottom: 1rem;
+    }
+
+    .loading-dots { display: inline-flex; gap: 5px; align-items: center; }
+    .loading-dots span {
+      width: 6px; height: 6px;
+      background: currentColor;
+      border-radius: 50%;
+      animation: blink 1.2s infinite both;
+    }
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink { 0%, 80%, 100% { opacity: 0.2; } 40% { opacity: 1; } }
+
+    .error-msg { color: #ff6b6b; font-size: 0.85rem; margin-top: 0.6rem; display: none; }
+    .error-msg.visible { display: block; }
+
+    footer {
+      margin-top: 2rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-align: center;
+      max-width: 480px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="tagline">Roast Me</div>
+    <p class="subtitle">AI-powered friendly roasts. You pick the heat. 🔥</p>
+  </header>
+
+  <div class="card">
+
+    <div class="meter-label">Heat level</div>
+    <div class="meter-track" id="meterTrack">
+      <div class="meter-fill" id="meterFill"></div>
+      <div class="meter-knob" id="meterKnob"></div>
+    </div>
+    <div class="meter-labels">
+      <button id="btn-light"  class="active-light"  onclick="setLevel('light')">🌶 Light</button>
+      <button id="btn-medium"                        onclick="setLevel('medium')">🔥 Medium</button>
+      <button id="btn-savage"                        onclick="setLevel('savage')">💀 Savage</button>
+    </div>
+
+    <div class="heat-display" id="heatDisplay">🌶</div>
+
+    <label class="field-label" for="subject">Who or what are we roasting?</label>
+    <textarea id="subject" placeholder="Tell me about your friend, yourself, your coworker's coffee obsession, your cat's Monday attitude…"></textarea>
+
+    <button class="roast-btn" id="roastBtn" onclick="generateRoast()">ROAST EM</button>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-heat-bar" id="resultBar"></div>
+      <button class="result-copy" id="copyBtn" onclick="copyRoast()">copy</button>
+      <div class="result-text" id="resultText"></div>
+    </div>
+
+  </div>
+
+  <footer>Powered by Claude. Your roasts are between you and the AI. 🤫</footer>
+
+  <script>
+    let level = 'light';
+
+    const levelConfig = {
+      light:  { pct: 16.5, btnClass: 'active-light',  barColor: '#f5c842', knobShadow: '0 0 0 3px #0e0d0c, 0 0 0 5px #f5c842', btnExtra: '',            flames: '🌶'     },
+      medium: { pct: 50,   btnClass: 'active-medium', barColor: '#f07030', knobShadow: '0 0 0 3px #0e0d0c, 0 0 0 5px #f07030', btnExtra: 'heat-medium', flames: '🔥🔥'   },
+      savage: { pct: 83.5, btnClass: 'active-savage', barColor: '#e8303a', knobShadow: '0 0 0 3px #0e0d0c, 0 0 0 5px #e8303a', btnExtra: 'heat-savage', flames: '💀🔥💀' },
+    };
+
+    function setLevel(l) {
+      level = l;
+      const cfg = levelConfig[l];
+      document.getElementById('meterFill').style.width = cfg.pct + '%';
+      document.getElementById('meterFill').style.background = cfg.barColor;
+      document.getElementById('meterKnob').style.left = cfg.pct + '%';
+      document.getElementById('meterKnob').style.boxShadow = cfg.knobShadow;
+      document.getElementById('heatDisplay').textContent = cfg.flames;
+      ['light','medium','savage'].forEach(x => {
+        document.getElementById('btn-'+x).className = (x === l) ? levelConfig[x].btnClass : '';
+      });
+      document.getElementById('roastBtn').className = 'roast-btn ' + cfg.btnExtra;
+      if (document.getElementById('resultBox').classList.contains('visible')) {
+        document.getElementById('resultBar').style.background = cfg.barColor;
+      }
+    }
+
+    async function generateRoast() {
+      const subject = document.getElementById('subject').value.trim();
+      const errorEl = document.getElementById('errorMsg');
+      const resultBox = document.getElementById('resultBox');
+      const resultText = document.getElementById('resultText');
+      const btn = document.getElementById('roastBtn');
+
+      errorEl.classList.remove('visible');
+      errorEl.textContent = '';
+
+      if (!subject) { showError('Give me someone (or something) to roast!'); return; }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading-dots"><span></span><span></span><span></span></span>';
+      resultBox.classList.remove('visible');
+      resultText.textContent = '';
+
+      try {
+        const res = await fetch('/api/roast', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subject, level }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Server error');
+
+        document.getElementById('resultBar').style.background = levelConfig[level].barColor;
+        resultText.textContent = data.roast;
+        resultBox.classList.add('visible');
+        setTimeout(() => resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+
+      } catch (err) {
+        showError(err.message || 'Something went wrong. Try again.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'ROAST EM';
+      }
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('errorMsg');
+      el.textContent = msg;
+      el.classList.add('visible');
+    }
+
+    function copyRoast() {
+      const text = document.getElementById('resultText').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = 'copied!';
+        setTimeout(() => (btn.textContent = 'copy'), 1800);
+      });
+    }
+
+    document.getElementById('subject').addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') generateRoast();
+    });
+
+    setLevel('light');
+  </script>
+
+</body>
+</html>
