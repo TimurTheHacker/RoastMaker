@@ -468,7 +468,7 @@
 
 <header>
   <div class="tagline">Roast Me</div>
-  <p class="subtitle">AI-powered roasts. You pick the heat. 🔥</p>
+  <p class="subtitle">Powered by Claude. You pick the heat. 🔥</p>
 </header>
 
 <div class="card">
@@ -675,7 +675,7 @@
     const win = document.getElementById('chatWindow');
     const b = document.createElement('div');
     b.className = 'bubble ' + (role === 'user' ? 'user' : 'ai');
-    b.innerHTML = `<div class="speaker">${role === 'user' ? 'You' : 'Claude'}</div>${escHtml(text)}`;
+    b.innerHTML = `<div class="speaker">${role === 'user' ? 'You' : 'Roast Master'}</div>${escHtml(text)}`;
     win.appendChild(b);
     win.scrollTop = win.scrollHeight;
     return b;
