@@ -1,10 +1,39 @@
 export const config = { runtime: 'edge' };
 
-const LEVEL_PROMPTS = {
-  light: `You are a friendly roast comedian. Generate a couple of SHORT, PLAYFUL roasts (3 roasts, 1-2 sentences) that are warm-hearted and gentle — like a close friend poking fun. However, make sure to add some wordplay and references that can make everyone laugh, such as a Voldemort Nose Reference. Keep it 100% friendly, totally appropriate for all audiences. No mean-spirited content. Just charming, harmless ribbing that makes people smile. End with a small compliment wrapped in the joke.`,
-  medium: `You are a stand-up roast comedian at a roast dinner. Generate a couple of PUNCHY roasts (3 roasts, 1-2 sentences) with real comedic bite. It should feel like a roast comedy special — witty, clever, a little sharp, but never truly cruel. You can make fun of quirks, habits, or personality traits. Keep it clever over mean. The subject should laugh the hardest.`,
-  savage: `You are a legendary roast master. Generate a series (3 short roasts, 1-2 sentences) of BRUTAL but still comedic roasts with tons wit and venom — like a Comedy Central roast. Get very creative and savage, make sure to reference other things, and also use wordplay. No slurs, no discrimination, no truly harmful content. Just devastating wit.`,
-};
+function buildSystemPrompt(heat, mode) {
+  // Continuous descriptors — every integer produces a unique blend
+  const gentleness  = Math.max(0, (40 - heat) / 40);   // 1 at 0, 0 at 40+
+  const savageness  = Math.max(0, (heat - 60) / 40);   // 0 at 60-, 1 at 100
+  const punchiness  = 1 - Math.abs(heat - 50) / 50;    // peaks at 50
+
+  const toneDesc =
+    heat <= 15  ? "extremely gentle and warm — like a close friend giving a soft tease over coffee" :
+    heat <= 30  ? "light and playful — charming ribbing that makes everyone smile, ending with a genuine compliment tucked into the joke" :
+    heat <= 45  ? "friendly but with a bit of edge — witty observations about quirks and habits, still keeping it warm" :
+    heat <= 55  ? "punchy stand-up energy — real comedic bite, clever and a little sharp, like a roast dinner set" :
+    heat <= 70  ? "sharp and pointed — Comedy Central roast vibes, pulling fewer punches, wit over cruelty" :
+    heat <= 85  ? "savage and relentless — brutal jokes with creative wordplay and pop-culture references, devastating but never hateful" :
+                  "absolutely merciless — legendary roast master energy, maximum wit and venom, like the closing act of a roast battle finale";
+
+  const styleNotes =
+    heat <= 30  ? "Use wordplay and clever references. End each roast with a small compliment wrapped in the joke. Keep it 100% appropriate for all audiences." :
+    heat <= 55  ? "Make fun of quirks, habits, and personality traits. Be clever over mean. The subject should laugh the hardest." :
+                  "Get creative and savage — use wordplay, pop-culture references, and unexpected comparisons. Wit is the weapon, not cruelty.";
+
+  if (mode === 'battle') {
+    return `You are a roast battle champion. The user is your opponent.
+Heat level: ${heat}/100 — ${toneDesc}.
+Respond ONLY with your comeback — no intro, no label, just the roast (2-4 sentences).
+${styleNotes}
+Never use slurs or be genuinely hateful.
+After your roast, on a new line write exactly: "YOUR TURN 🎤"`;
+  }
+
+  return `You are a roast comedian. Heat level: ${heat}/100 — ${toneDesc}.
+Generate exactly 3 roasts (1-2 sentences each) of the subject described by the user.
+${styleNotes}
+Never use slurs or be genuinely hateful. Respond with only the 3 roasts, numbered 1–3. No preamble.`;
+}
 
 export default async function handler(req) {
   if (req.method !== 'POST') {
@@ -14,56 +43,53 @@ export default async function handler(req) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return new Response(JSON.stringify({ error: 'API key not configured on server.' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      status: 500, headers: { 'Content-Type': 'application/json' },
     });
   }
 
   let body;
-  try {
-    body = await req.json();
-  } catch {
-    return new Response(JSON.stringify({ error: 'Invalid JSON body.' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
+  try { body = await req.json(); }
+  catch { return new Response(JSON.stringify({ error: 'Invalid JSON.' }), { status: 400, headers: { 'Content-Type': 'application/json' } }); }
+
+  const { subject, heat, mode, messages } = body;
+  const heatVal = Math.min(100, Math.max(0, Math.round(Number(heat) || 50)));
+
+  if (mode === 'battle') {
+    if (!messages || !Array.isArray(messages)) {
+      return new Response(JSON.stringify({ error: 'Missing messages for battle mode.' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        system: buildSystemPrompt(heatVal, 'battle'),
+        messages,
+      }),
     });
+    const data = await res.json();
+    if (!res.ok) return new Response(JSON.stringify({ error: data?.error?.message || 'API error' }), { status: res.status, headers: { 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify({ roast: data.content?.[0]?.text || '...' }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   }
 
-  const { subject, level } = body;
-  if (!subject || !level || !LEVEL_PROMPTS[level]) {
-    return new Response(JSON.stringify({ error: 'Missing subject or valid level.' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
+  // single roast mode
+  if (!subject) {
+    return new Response(JSON.stringify({ error: 'Missing subject.' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
   }
 
-  const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-    },
+    headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 512,
-      system: LEVEL_PROMPTS[level],
+      max_tokens: 300,
+      system: buildSystemPrompt(heatVal, 'single'),
       messages: [{ role: 'user', content: `Roast this subject: ${subject}` }],
     }),
   });
-
-  const data = await anthropicRes.json();
-
-  if (!anthropicRes.ok) {
-    return new Response(JSON.stringify({ error: data?.error?.message || 'Anthropic API error.' }), {
-      status: anthropicRes.status,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-
-  const roast = data.content?.[0]?.text || 'They are unroastable.';
-  return new Response(JSON.stringify({ roast }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' },
-  });
+  const data = await res.json();
+  if (!res.ok) return new Response(JSON.stringify({ error: data?.error?.message || 'API error' }), { status: res.status, headers: { 'Content-Type': 'application/json' } });
+  return new Response(JSON.stringify({ roast: data.content?.[0]?.text || 'They are unroastable.' }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 }
