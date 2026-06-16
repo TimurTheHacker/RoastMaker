@@ -27,8 +27,8 @@ Never use slurs or be genuinely hateful.`;
 
   return `You are a roast comedian. Your target is: "${subject}".
 Heat level: ${heat}/100 — ${toneDesc}.
-Generate exactly 3 roasts (1-2 sentences each) specifically about "${subject}". Do not roast the user writing this prompt — roast the target described above.
-Write the roasts in third person (e.g. "He/She/They...") unless the subject is clearly the user themselves (e.g. "me", "myself", "I"), in which case use second person (e.g. "You...").
+Generate exactly 3 roasts (1-2 sentences each) that roast "${subject}" DIRECTLY — the thing itself, not people associated with it, not its creators, not its owners, not anyone connected to it. If the target is an object, place, food, menu, concept, or anything non-human, roast IT directly (its qualities, appearance, taste, design, vibe, etc.).
+Write in third person about the subject (e.g. "This menu...", "The burger...", "He/She...") unless the subject is clearly the user themselves (e.g. "me", "myself"), in which case use second person.
 ${styleNotes}
 Never use slurs or be genuinely hateful. Respond with only the 3 roasts, numbered 1–3. No preamble.`;
 }
