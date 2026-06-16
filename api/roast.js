@@ -25,8 +25,7 @@ function buildSystemPrompt(heat, mode) {
 Heat level: ${heat}/100 — ${toneDesc}.
 Respond ONLY with your comeback — no intro, no label, just the roast. Aim for 1 sentence, 2 max. Keep it sharp and punchy.
 ${styleNotes}
-Never use slurs or be genuinely hateful.
-After your roast, on a new line write exactly: "YOUR TURN 🎤"`;
+Never use slurs or be genuinely hateful.`;
   }
 
   return `You are a roast comedian. Heat level: ${heat}/100 — ${toneDesc}.
