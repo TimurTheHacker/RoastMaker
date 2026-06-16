@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Roast Me 🔥</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -13,15 +13,13 @@
       --bg: #0e0d0c;
       --surface: #1a1917;
       --surface2: #242220;
+      --surface3: #2e2b28;
       --border: rgba(255,255,255,0.08);
       --text: #f0ede8;
       --muted: #888580;
-      --accent-light: #f5c842;
-      --accent-med: #f07030;
-      --accent-savage: #e8303a;
       --font-display: 'Bebas Neue', sans-serif;
       --font-body: 'DM Sans', sans-serif;
-      --radius: 12px;
+      --radius: 14px;
     }
 
     body {
@@ -32,104 +30,189 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 2rem 1rem 4rem;
+      padding: 2rem 1rem 5rem;
     }
 
-    header { text-align: center; margin-bottom: 2.5rem; }
+    /* ── HEADER ── */
+    header { text-align: center; margin-bottom: 2rem; }
 
     .tagline {
       font-family: var(--font-display);
       font-size: clamp(3.5rem, 10vw, 7rem);
       letter-spacing: 0.04em;
       line-height: 0.9;
-      background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent-med) 50%, var(--accent-savage) 100%);
+      background: linear-gradient(135deg, #f5c842 0%, #f07030 50%, #e8303a 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
 
-    .subtitle {
-      margin-top: 0.6rem;
-      font-size: 0.95rem;
-      color: var(--muted);
-      letter-spacing: 0.03em;
-    }
+    .subtitle { margin-top: 0.55rem; font-size: 0.92rem; color: var(--muted); }
 
+    /* ── CARD ── */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 1.75rem;
       width: 100%;
-      max-width: 620px;
+      max-width: 640px;
     }
 
-    .meter-label {
-      font-size: 0.75rem;
+    /* ── MODE TOGGLE ── */
+    .mode-toggle {
+      display: flex;
+      background: var(--surface2);
+      border-radius: 99px;
+      padding: 4px;
+      gap: 4px;
+      margin-bottom: 1.75rem;
+    }
+
+    .mode-toggle button {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 99px;
+      cursor: pointer;
+      transition: all 0.25s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .mode-toggle button.active {
+      background: var(--surface3);
+      color: var(--text);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+
+    /* ── SLIDER ── */
+    .slider-section { margin-bottom: 1.5rem; }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.75rem;
+    }
+
+    .slider-label {
+      font-size: 0.72rem;
       text-transform: uppercase;
       letter-spacing: 0.1em;
       color: var(--muted);
-      margin-bottom: 0.6rem;
     }
 
-    .meter-track {
+    .slider-track-wrap {
       position: relative;
-      height: 8px;
-      background: var(--surface2);
-      border-radius: 99px;
-      margin-bottom: 0.5rem;
-      overflow: visible;
+      height: 52px;
+      display: flex;
+      align-items: flex-end;
+      padding-bottom: 4px;
     }
 
-    .meter-fill {
-      height: 100%;
-      border-radius: 99px;
-      transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1), background 0.5s;
-      width: 16.5%;
-      background: var(--accent-light);
-    }
-
-    .meter-knob {
+    /* floating number that rides the thumb */
+    .thumb-label {
       position: absolute;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: 20px;
-      height: 20px;
-      background: var(--text);
-      border-radius: 50%;
+      bottom: 100%;
+      transform: translateX(-50%);
+      margin-bottom: 10px;
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      letter-spacing: 0.05em;
+      line-height: 1;
+      pointer-events: none;
+      transition: color 0.2s;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    /* little caret below the number */
+    .thumb-label::after {
+      content: '';
+      display: block;
+      width: 6px;
+      height: 6px;
+      background: currentColor;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      margin: 4px auto 0;
+    }
+
+    /* native range, fully styled */
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      background: transparent;
+      outline: none;
       cursor: pointer;
-      left: 16.5%;
-      transition: left 0.5s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
-      box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--accent-light);
+      position: relative;
       z-index: 2;
     }
 
-    .meter-labels {
+    input[type=range]::-webkit-slider-runnable-track {
+      height: 8px;
+      border-radius: 99px;
+      background: var(--track-bg, var(--surface2));
+    }
+
+    input[type=range]::-moz-range-track {
+      height: 8px;
+      border-radius: 99px;
+      background: var(--surface2);
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #fff;
+      margin-top: -8px;
+      box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--thumb-color, #f5c842);
+      transition: box-shadow 0.3s, transform 0.15s;
+    }
+
+    input[type=range]:active::-webkit-slider-thumb {
+      transform: scale(1.15);
+    }
+
+    input[type=range]::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #fff;
+      border: none;
+      box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--thumb-color, #f5c842);
+    }
+
+    .slider-ticks {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 1.25rem;
+      margin-top: 0.4rem;
+      padding: 0 2px;
     }
 
-    .meter-labels button {
-      background: none;
-      border: 1px solid var(--border);
+    .slider-ticks span {
+      font-size: 0.72rem;
       color: var(--muted);
-      font-family: var(--font-body);
-      font-size: 0.8rem;
-      padding: 0.3rem 0.85rem;
-      border-radius: 99px;
-      cursor: pointer;
-      transition: all 0.2s;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
     }
 
-    .meter-labels button:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
-    .meter-labels button.active-light  { background: rgba(245,200,66,0.15); border-color: var(--accent-light); color: var(--accent-light); }
-    .meter-labels button.active-medium { background: rgba(240,112,48,0.15); border-color: var(--accent-med);   color: var(--accent-med);   }
-    .meter-labels button.active-savage { background: rgba(232,48,58,0.15);  border-color: var(--accent-savage); color: var(--accent-savage); }
+    /* ── SINGLE MODE ── */
+    #singleMode { display: block; }
+    #battleMode { display: none; }
 
     .field-label {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       text-transform: uppercase;
       letter-spacing: 0.1em;
       color: var(--muted);
@@ -148,41 +231,41 @@
       line-height: 1.6;
       padding: 0.85rem 1rem;
       resize: vertical;
-      min-height: 110px;
+      min-height: 100px;
       outline: none;
       transition: border-color 0.2s;
       margin-bottom: 1rem;
     }
 
-    textarea:focus { border-color: rgba(255,255,255,0.25); }
+    textarea:focus { border-color: rgba(255,255,255,0.2); }
     textarea::placeholder { color: var(--muted); }
 
+    /* ── BUTTON ── */
     .roast-btn {
       width: 100%;
-      padding: 0.9rem;
+      padding: 0.85rem;
       border: none;
       border-radius: 8px;
       font-family: var(--font-display);
-      font-size: 1.6rem;
+      font-size: 1.55rem;
       letter-spacing: 0.08em;
       cursor: pointer;
-      transition: transform 0.15s, opacity 0.2s, background 0.4s;
-      background: var(--accent-light);
-      color: #1a1200;
+      transition: transform 0.15s, filter 0.2s;
+      background: var(--btn-color, #f5c842);
+      color: var(--btn-text, #1a1200);
     }
 
-    .roast-btn:hover:not(:disabled) { transform: translateY(-2px); }
+    .roast-btn:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-2px); }
     .roast-btn:active:not(:disabled) { transform: scale(0.98); }
-    .roast-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .roast-btn.heat-medium { background: var(--accent-med); color: #fff; }
-    .roast-btn.heat-savage { background: var(--accent-savage); color: #fff; }
+    .roast-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
+    /* ── RESULT (single) ── */
     .result-box {
-      margin-top: 1.5rem;
+      margin-top: 1.4rem;
       background: var(--surface2);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 1.25rem 1.5rem;
+      padding: 1.2rem 1.4rem;
       display: none;
       position: relative;
     }
@@ -193,27 +276,26 @@
       height: 3px;
       border-radius: 99px;
       margin-bottom: 1rem;
-      background: var(--accent-light);
-      transition: background 0.4s;
+      transition: background 0.4s, width 0.4s;
     }
 
     .result-text {
-      font-size: 1.05rem;
-      line-height: 1.7;
+      font-size: 1rem;
+      line-height: 1.75;
       color: var(--text);
       white-space: pre-wrap;
     }
 
     .result-copy {
       position: absolute;
-      top: 0.85rem;
+      top: 0.8rem;
       right: 1rem;
       background: none;
       border: 1px solid var(--border);
       color: var(--muted);
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-family: var(--font-body);
-      padding: 0.25rem 0.6rem;
+      padding: 0.22rem 0.6rem;
       border-radius: 6px;
       cursor: pointer;
       transition: all 0.2s;
@@ -221,164 +303,488 @@
 
     .result-copy:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
 
-    .heat-display {
-      font-size: 1.1rem;
-      text-align: center;
-      height: 1.4rem;
-      letter-spacing: -0.02em;
-      transition: all 0.4s;
-      margin-bottom: 1rem;
+    /* ── BATTLE MODE ── */
+    .battle-intro {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+      line-height: 1.5;
     }
 
-    .loading-dots { display: inline-flex; gap: 5px; align-items: center; }
-    .loading-dots span {
-      width: 6px; height: 6px;
-      background: currentColor;
+    .chat-window {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      height: 360px;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 0.85rem;
+      scroll-behavior: smooth;
+    }
+
+    .chat-window::-webkit-scrollbar { width: 4px; }
+    .chat-window::-webkit-scrollbar-track { background: transparent; }
+    .chat-window::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 99px; }
+
+    .chat-empty {
+      margin: auto;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    .chat-empty .big { font-size: 2rem; display: block; margin-bottom: 0.4rem; }
+
+    .bubble {
+      max-width: 82%;
+      padding: 0.7rem 1rem;
+      border-radius: 14px;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      animation: popIn 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.92) translateY(6px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .bubble.ai {
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+
+    .bubble.user {
+      background: linear-gradient(135deg, rgba(245,200,66,0.18), rgba(240,112,48,0.18));
+      border: 1px solid rgba(245,200,66,0.2);
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+
+    .bubble .speaker {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+    }
+
+    .bubble.typing .dots {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+      height: 1.2em;
+    }
+
+    .bubble.typing .dots span {
+      width: 5px; height: 5px;
+      background: var(--muted);
       border-radius: 50%;
       animation: blink 1.2s infinite both;
     }
+
+    .bubble.typing .dots span:nth-child(2) { animation-delay: 0.2s; }
+    .bubble.typing .dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+
+    .battle-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .battle-input-row textarea {
+      flex: 1;
+      margin-bottom: 0;
+      min-height: 48px;
+      max-height: 120px;
+      resize: none;
+      padding: 0.7rem 0.9rem;
+      font-size: 0.92rem;
+    }
+
+    .send-btn {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: filter 0.2s, transform 0.15s;
+      background: var(--btn-color, #f5c842);
+    }
+
+    .send-btn:hover:not(:disabled) { filter: brightness(1.12); transform: translateY(-1px); }
+    .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .send-btn svg { width: 20px; height: 20px; fill: #1a1200; }
+
+    .battle-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 0.6rem;
+    }
+
+    .battle-actions button {
+      flex: 1;
+      padding: 0.45rem 0.75rem;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .battle-actions button:hover { border-color: rgba(255,255,255,0.22); color: var(--text); }
+
+    /* ── LOADING (dots inline) ── */
+    .loading-dots { display: inline-flex; gap: 5px; align-items: center; }
+    .loading-dots span { width: 6px; height: 6px; background: currentColor; border-radius: 50%; animation: blink 1.2s infinite both; }
     .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
     .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes blink { 0%, 80%, 100% { opacity: 0.2; } 40% { opacity: 1; } }
 
-    .error-msg { color: #ff6b6b; font-size: 0.85rem; margin-top: 0.6rem; display: none; }
+    /* ── ERROR ── */
+    .error-msg { color: #ff6b6b; font-size: 0.82rem; margin-top: 0.6rem; display: none; }
     .error-msg.visible { display: block; }
 
-    footer {
-      margin-top: 2rem;
-      font-size: 0.78rem;
-      color: var(--muted);
-      text-align: center;
-      max-width: 480px;
-    }
+    /* ── FOOTER ── */
+    footer { margin-top: 1.75rem; font-size: 0.76rem; color: var(--muted); text-align: center; max-width: 480px; line-height: 1.6; }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="tagline">Roast Me</div>
-    <p class="subtitle">AI-powered friendly roasts. You pick the heat. 🔥</p>
-  </header>
+<header>
+  <div class="tagline">Roast Me</div>
+  <p class="subtitle">AI-powered roasts. You pick the heat. 🔥</p>
+</header>
 
-  <div class="card">
+<div class="card">
 
-    <div class="meter-label">Heat level</div>
-    <div class="meter-track" id="meterTrack">
-      <div class="meter-fill" id="meterFill"></div>
-      <div class="meter-knob" id="meterKnob"></div>
+  <!-- MODE TOGGLE -->
+  <div class="mode-toggle">
+    <button id="modeRoast" class="active" onclick="setMode('roast')">🎯 Roast Generator</button>
+    <button id="modeBattle" onclick="setMode('battle')">🥊 Roast Battle</button>
+  </div>
+
+  <!-- HEAT SLIDER (shared) -->
+  <div class="slider-section">
+    <div class="slider-header">
+      <span class="slider-label">Heat Level</span>
     </div>
-    <div class="meter-labels">
-      <button id="btn-light"  class="active-light"  onclick="setLevel('light')">🌶 Light</button>
-      <button id="btn-medium"                        onclick="setLevel('medium')">🔥 Medium</button>
-      <button id="btn-savage"                        onclick="setLevel('savage')">💀 Savage</button>
+    <div class="slider-track-wrap">
+      <span class="thumb-label" id="thumbLabel">50 🌶</span>
+      <input type="range" id="heatSlider" min="0" max="100" value="50" oninput="onSlider()" />
     </div>
+    <div class="slider-ticks">
+      <span>🌶 Light</span>
+      <span>🔥 Medium</span>
+      <span>💀 Savage</span>
+    </div>
+  </div>
 
-    <div class="heat-display" id="heatDisplay">🌶</div>
-
+  <!-- SINGLE ROAST MODE -->
+  <div id="singleMode">
     <label class="field-label" for="subject">Who or what are we roasting?</label>
-    <textarea id="subject" placeholder="Tell me about your friend, yourself, your coworker's coffee obsession, your cat's Monday attitude…"></textarea>
-
+    <textarea id="subject" placeholder="Your friend's obsession with sourdough starter, your boss's calendar invites, yourself on a Monday…"></textarea>
     <button class="roast-btn" id="roastBtn" onclick="generateRoast()">ROAST EM</button>
-
-    <div class="error-msg" id="errorMsg"></div>
-
+    <div class="error-msg" id="singleError"></div>
     <div class="result-box" id="resultBox">
       <div class="result-heat-bar" id="resultBar"></div>
       <button class="result-copy" id="copyBtn" onclick="copyRoast()">copy</button>
       <div class="result-text" id="resultText"></div>
     </div>
-
   </div>
 
-  <footer>Powered by Claude. Your roasts are between you and the AI. 🤫</footer>
+  <!-- BATTLE MODE -->
+  <div id="battleMode">
+    <p class="battle-intro">Go head-to-head with the AI. You throw a roast, it fires back. Adjust heat above to make it meaner (or kinder). First to run out of comebacks loses.</p>
+    <div class="chat-window" id="chatWindow">
+      <div class="chat-empty" id="chatEmpty">
+        <span class="big">🎤</span>
+        Throw your first roast to start the battle.
+      </div>
+    </div>
+    <div class="battle-input-row">
+      <textarea id="battleInput" placeholder="Your roast…" onkeydown="battleKey(event)" rows="1" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendBattleMessage()" title="Send">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M2 21L23 12 2 3v7l15 2-15 2z"/></svg>
+      </button>
+    </div>
+    <div class="battle-actions">
+      <button onclick="clearBattle()">🗑 Clear chat</button>
+      <button onclick="copyBattle()">📋 Copy transcript</button>
+    </div>
+    <div class="error-msg" id="battleError"></div>
+  </div>
 
-  <script>
-    let level = 'light';
+</div>
 
-    const levelConfig = {
-      light:  { pct: 16.5, btnClass: 'active-light',  barColor: '#f5c842', knobShadow: '0 0 0 3px #0e0d0c, 0 0 0 5px #f5c842', btnExtra: '',            flames: '🌶'     },
-      medium: { pct: 50,   btnClass: 'active-medium', barColor: '#f07030', knobShadow: '0 0 0 3px #0e0d0c, 0 0 0 5px #f07030', btnExtra: 'heat-medium', flames: '🔥🔥'   },
-      savage: { pct: 83.5, btnClass: 'active-savage', barColor: '#e8303a', knobShadow: '0 0 0 3px #0e0d0c, 0 0 0 5px #e8303a', btnExtra: 'heat-savage', flames: '💀🔥💀' },
-    };
+<footer>Powered by Claude. Your roasts are between you and the AI 🤫</footer>
 
-    function setLevel(l) {
-      level = l;
-      const cfg = levelConfig[l];
-      document.getElementById('meterFill').style.width = cfg.pct + '%';
-      document.getElementById('meterFill').style.background = cfg.barColor;
-      document.getElementById('meterKnob').style.left = cfg.pct + '%';
-      document.getElementById('meterKnob').style.boxShadow = cfg.knobShadow;
-      document.getElementById('heatDisplay').textContent = cfg.flames;
-      ['light','medium','savage'].forEach(x => {
-        document.getElementById('btn-'+x).className = (x === l) ? levelConfig[x].btnClass : '';
+<script>
+  // ── STATE ──
+  let heat = 50;
+  let mode = 'roast';
+  let battleMessages = []; // Anthropic message history
+  let isBusy = false;
+
+  // ── HEAT COLOR ──
+  function heatColor(h) {
+    // interpolate: 0 → yellow, 50 → orange, 100 → red
+    if (h <= 50) {
+      const t = h / 50;
+      const r = Math.round(245 + (240 - 245) * t);
+      const g = Math.round(200 + (112 - 200) * t);
+      const b = Math.round(66  + (48  - 66)  * t);
+      return `rgb(${r},${g},${b})`;
+    } else {
+      const t = (h - 50) / 50;
+      const r = Math.round(240 + (232 - 240) * t);
+      const g = Math.round(112 + (48  - 112) * t);
+      const b = Math.round(48  + (58  - 48)  * t);
+      return `rgb(${r},${g},${b})`;
+    }
+  }
+
+  function heatEmoji(h) {
+    if (h <= 20) return '🌱';
+    if (h <= 40) return '🌶';
+    if (h <= 60) return '🔥';
+    if (h <= 80) return '💀';
+    return '☢️';
+  }
+
+  function applyHeatUI(h) {
+    const color = heatColor(h);
+    const pct = h / 100;
+
+    // floating thumb label
+    const thumbRadius = 12;
+    const label = document.getElementById('thumbLabel');
+    const track = document.getElementById('heatSlider');
+    const trackW = track.offsetWidth || track.getBoundingClientRect().width;
+    const usable = trackW - thumbRadius * 2;
+    const leftPx = thumbRadius + usable * pct;
+    label.style.left = leftPx + 'px';
+    label.textContent = h + ' ' + heatEmoji(h);
+    label.style.color = color;
+
+    // slider fill
+    const fillPct = h + '%';
+    track.style.setProperty('--track-bg',
+      `linear-gradient(to right, ${color} 0%, ${color} ${fillPct}, var(--surface2) ${fillPct}, var(--surface2) 100%)`
+    );
+    track.style.setProperty('--thumb-color', color);
+
+    // button text color — smooth crossover 30→60 instead of a hard flip
+    // blend dark (#1a1200) → white (#ffffff) using a smoothstep over that band
+    const t = Math.max(0, Math.min(1, (h - 30) / 30)); // 0 at h=30, 1 at h=60
+    const smooth = t * t * (3 - 2 * t); // smoothstep
+    const tr = Math.round(26  + (255 - 26)  * smooth);
+    const tg = Math.round(18  + (255 - 18)  * smooth);
+    const tb = Math.round(0   + (255 - 0)   * smooth);
+    const textColor = `rgb(${tr},${tg},${tb})`;
+
+    const btn = document.getElementById('roastBtn');
+    btn.style.setProperty('--btn-color', color);
+    btn.style.setProperty('--btn-text', textColor);
+
+    const sendBtn = document.getElementById('sendBtn');
+    sendBtn.style.background = color;
+    sendBtn.querySelector('svg').style.fill = textColor;
+
+    // result bar
+    document.getElementById('resultBar').style.background = color;
+    document.getElementById('resultBar').style.width = fillPct;
+  }
+
+  function onSlider() {
+    heat = parseInt(document.getElementById('heatSlider').value);
+    applyHeatUI(heat);
+  }
+
+  // ── MODE TOGGLE ──
+  function setMode(m) {
+    mode = m;
+    document.getElementById('modeRoast').classList.toggle('active', m === 'roast');
+    document.getElementById('modeBattle').classList.toggle('active', m === 'battle');
+    document.getElementById('singleMode').style.display = m === 'roast' ? 'block' : 'none';
+    document.getElementById('battleMode').style.display = m === 'battle' ? 'block' : 'none';
+  }
+
+  // ── SINGLE ROAST ──
+  async function generateRoast() {
+    const subject = document.getElementById('subject').value.trim();
+    const errorEl = document.getElementById('singleError');
+    const resultBox = document.getElementById('resultBox');
+    const resultText = document.getElementById('resultText');
+    const btn = document.getElementById('roastBtn');
+
+    errorEl.classList.remove('visible');
+    if (!subject) { showErr(errorEl, 'Give me someone (or something) to roast!'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading-dots"><span></span><span></span><span></span></span>';
+    resultBox.classList.remove('visible');
+
+    try {
+      const res = await fetch('/api/roast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, heat, mode: 'single' }),
       });
-      document.getElementById('roastBtn').className = 'roast-btn ' + cfg.btnExtra;
-      if (document.getElementById('resultBox').classList.contains('visible')) {
-        document.getElementById('resultBar').style.background = cfg.barColor;
-      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Server error');
+      resultText.textContent = data.roast;
+      resultBox.classList.add('visible');
+      setTimeout(() => resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
+    } catch (e) {
+      showErr(errorEl, e.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = 'ROAST EM';
     }
+  }
 
-    async function generateRoast() {
-      const subject = document.getElementById('subject').value.trim();
-      const errorEl = document.getElementById('errorMsg');
-      const resultBox = document.getElementById('resultBox');
-      const resultText = document.getElementById('resultText');
-      const btn = document.getElementById('roastBtn');
-
-      errorEl.classList.remove('visible');
-      errorEl.textContent = '';
-
-      if (!subject) { showError('Give me someone (or something) to roast!'); return; }
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="loading-dots"><span></span><span></span><span></span></span>';
-      resultBox.classList.remove('visible');
-      resultText.textContent = '';
-
-      try {
-        const res = await fetch('/api/roast', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ subject, level }),
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Server error');
-
-        document.getElementById('resultBar').style.background = levelConfig[level].barColor;
-        resultText.textContent = data.roast;
-        resultBox.classList.add('visible');
-        setTimeout(() => resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
-
-      } catch (err) {
-        showError(err.message || 'Something went wrong. Try again.');
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = 'ROAST EM';
-      }
-    }
-
-    function showError(msg) {
-      const el = document.getElementById('errorMsg');
-      el.textContent = msg;
-      el.classList.add('visible');
-    }
-
-    function copyRoast() {
-      const text = document.getElementById('resultText').textContent;
-      navigator.clipboard.writeText(text).then(() => {
-        const btn = document.getElementById('copyBtn');
-        btn.textContent = 'copied!';
-        setTimeout(() => (btn.textContent = 'copy'), 1800);
-      });
-    }
-
-    document.getElementById('subject').addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') generateRoast();
+  function copyRoast() {
+    navigator.clipboard.writeText(document.getElementById('resultText').textContent).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'copied!';
+      setTimeout(() => btn.textContent = 'copy', 1800);
     });
+  }
 
-    setLevel('light');
-  </script>
+  // ── BATTLE MODE ──
+  function addBubble(text, role) {
+    const empty = document.getElementById('chatEmpty');
+    if (empty) empty.remove();
+
+    const win = document.getElementById('chatWindow');
+    const b = document.createElement('div');
+    b.className = 'bubble ' + (role === 'user' ? 'user' : 'ai');
+    b.innerHTML = `<div class="speaker">${role === 'user' ? 'You' : 'Claude'}</div>${escHtml(text)}`;
+    win.appendChild(b);
+    win.scrollTop = win.scrollHeight;
+    return b;
+  }
+
+  function addTypingBubble() {
+    const empty = document.getElementById('chatEmpty');
+    if (empty) empty.remove();
+
+    const win = document.getElementById('chatWindow');
+    const b = document.createElement('div');
+    b.className = 'bubble ai typing';
+    b.innerHTML = `<div class="speaker">Claude</div><span class="dots"><span></span><span></span><span></span></span>`;
+    win.appendChild(b);
+    win.scrollTop = win.scrollHeight;
+    return b;
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  }
+
+  async function sendBattleMessage() {
+    const input = document.getElementById('battleInput');
+    const text = input.value.trim();
+    const errorEl = document.getElementById('battleError');
+    if (!text || isBusy) return;
+
+    errorEl.classList.remove('visible');
+    isBusy = true;
+    document.getElementById('sendBtn').disabled = true;
+    input.value = '';
+    input.style.height = '';
+
+    // Add user message
+    addBubble(text, 'user');
+    battleMessages.push({ role: 'user', content: text });
+
+    // Typing indicator
+    const typingBubble = addTypingBubble();
+
+    try {
+      const res = await fetch('/api/roast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ heat, mode: 'battle', messages: battleMessages }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Server error');
+
+      typingBubble.remove();
+      addBubble(data.roast, 'ai');
+      battleMessages.push({ role: 'assistant', content: data.roast });
+
+    } catch (e) {
+      typingBubble.remove();
+      showErr(errorEl, e.message);
+      // roll back last user message so they can retry
+      battleMessages.pop();
+    } finally {
+      isBusy = false;
+      document.getElementById('sendBtn').disabled = false;
+      input.focus();
+    }
+  }
+
+  function battleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendBattleMessage();
+    }
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  function clearBattle() {
+    battleMessages = [];
+    const win = document.getElementById('chatWindow');
+    win.innerHTML = `<div class="chat-empty" id="chatEmpty"><span class="big">🎤</span>Throw your first roast to start the battle.</div>`;
+  }
+
+  function copyBattle() {
+    const lines = battleMessages.map(m =>
+      (m.role === 'user' ? 'You' : 'Claude') + ': ' + m.content
+    ).join('\n\n');
+    if (!lines) return;
+    navigator.clipboard.writeText(lines).then(() => {
+      const btns = document.querySelectorAll('.battle-actions button');
+      btns[1].textContent = '✓ Copied!';
+      setTimeout(() => btns[1].textContent = '📋 Copy transcript', 1800);
+    });
+  }
+
+  // ── UTILS ──
+  function showErr(el, msg) { el.textContent = msg; el.classList.add('visible'); }
+
+  document.getElementById('subject').addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') generateRoast();
+  });
+
+  // re-position label if window resizes
+  window.addEventListener('resize', () => applyHeatUI(heat));
+
+  // init — defer one frame so offsetWidth is populated
+  requestAnimationFrame(() => applyHeatUI(heat));
+</script>
 
 </body>
 </html>
