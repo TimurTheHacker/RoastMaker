@@ -23,7 +23,7 @@ function buildSystemPrompt(heat, mode) {
   if (mode === 'battle') {
     return `You are a roast battle champion. The user is your opponent.
 Heat level: ${heat}/100 — ${toneDesc}.
-Respond ONLY with your comeback — no intro, no label, just the roast (2-4 sentences).
+Respond ONLY with your comeback — no intro, no label, just the roast. Aim for 1 sentence, 2 max. Keep it sharp and punchy.
 ${styleNotes}
 Never use slurs or be genuinely hateful.
 After your roast, on a new line write exactly: "YOUR TURN 🎤"`;
