@@ -478,6 +478,7 @@
   <div class="mode-toggle">
     <button id="modeRoast" class="active" onclick="setMode('roast')">🎯 Roast Generator</button>
     <button id="modeBattle" onclick="setMode('battle')">🥊 Roast Battle</button>
+    <button id="modeDiss" onclick="setMode('diss')">🎤 Diss Track</button>
   </div>
 
   <!-- HEAT SLIDER (shared) -->
@@ -509,7 +510,18 @@
     </div>
   </div>
 
-  <!-- BATTLE MODE -->
+  <!-- DISS TRACK MODE -->
+  <div id="dissMode" style="display:none">
+    <label class="field-label" for="dissSubject">Who are we writing a diss track about?</label>
+    <textarea id="dissSubject" placeholder="Your nemesis, your ex's new partner, your landlord, a fictional villain…"></textarea>
+    <button class="roast-btn" id="dissBtn" onclick="generateDiss()">WRITE THE TRACK</button>
+    <div class="error-msg" id="dissError"></div>
+    <div class="result-box" id="dissResultBox">
+      <div class="result-heat-bar" id="dissResultBar" style="width:0"></div>
+      <button class="result-copy" id="dissCopyBtn" onclick="copyDiss()">copy</button>
+      <div class="result-text" id="dissResultText"></div>
+    </div>
+  </div>
   <div id="battleMode">
     <p class="battle-intro">Go head-to-head with the AI. You throw a roast, it fires back. Adjust heat above to make it meaner (or kinder). First to run out of comebacks loses.</p>
     <div class="chat-window" id="chatWindow">
@@ -603,13 +615,18 @@
     btn.style.setProperty('--btn-color', color);
     btn.style.setProperty('--btn-text', textColor);
 
+    const dissBtn = document.getElementById('dissBtn');
+    dissBtn.style.setProperty('--btn-color', color);
+    dissBtn.style.setProperty('--btn-text', textColor);
+
     const sendBtn = document.getElementById('sendBtn');
     sendBtn.style.background = color;
     sendBtn.querySelector('svg').style.fill = textColor;
 
-    // result bar
+    // result bars
     document.getElementById('resultBar').style.background = color;
     document.getElementById('resultBar').style.width = fillPct;
+    document.getElementById('dissResultBar').style.background = color;
   }
 
   function onSlider() {
@@ -622,8 +639,10 @@
     mode = m;
     document.getElementById('modeRoast').classList.toggle('active', m === 'roast');
     document.getElementById('modeBattle').classList.toggle('active', m === 'battle');
+    document.getElementById('modeDiss').classList.toggle('active', m === 'diss');
     document.getElementById('singleMode').style.display = m === 'roast' ? 'block' : 'none';
     document.getElementById('battleMode').style.display = m === 'battle' ? 'block' : 'none';
+    document.getElementById('dissMode').style.display = m === 'diss' ? 'block' : 'none';
   }
 
   // ── SINGLE ROAST ──
@@ -663,6 +682,50 @@
   function copyRoast() {
     navigator.clipboard.writeText(document.getElementById('resultText').textContent).then(() => {
       const btn = document.getElementById('copyBtn');
+      btn.textContent = 'copied!';
+      setTimeout(() => btn.textContent = 'copy', 1800);
+    });
+  }
+
+  // ── DISS TRACK ──
+  async function generateDiss() {
+    const subject = document.getElementById('dissSubject').value.trim();
+    const errorEl = document.getElementById('dissError');
+    const resultBox = document.getElementById('dissResultBox');
+    const resultText = document.getElementById('dissResultText');
+    const btn = document.getElementById('dissBtn');
+
+    errorEl.classList.remove('visible');
+    if (!subject) { showErr(errorEl, 'Who are we dissing?'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading-dots"><span></span><span></span><span></span></span>';
+    resultBox.classList.remove('visible');
+
+    try {
+      const res = await fetch('/api/roast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, heat, mode: 'diss' }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Server error');
+      document.getElementById('dissResultBar').style.background = heatColor(heat);
+      document.getElementById('dissResultBar').style.width = heat + '%';
+      resultText.textContent = data.roast;
+      resultBox.classList.add('visible');
+      setTimeout(() => resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
+    } catch (e) {
+      showErr(errorEl, e.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = 'WRITE THE TRACK';
+    }
+  }
+
+  function copyDiss() {
+    navigator.clipboard.writeText(document.getElementById('dissResultText').textContent).then(() => {
+      const btn = document.getElementById('dissCopyBtn');
       btn.textContent = 'copied!';
       setTimeout(() => btn.textContent = 'copy', 1800);
     });
