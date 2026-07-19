@@ -82,12 +82,18 @@ export default async function handler(req) {
       return new Response(JSON.stringify({ error: 'Missing subject.' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const dissPrompt = `You are a legendary hip-hop ghostwriter. Write a diss track about: "${subject}".
+    const dissPrompt = `You are a witty songwriter writing a diss track. The target is: "${subject}".
 Heat level: ${heatVal}/100 — ${buildToneDesc(heatVal)}.
-Format: exactly 8-10 lines of rap lyrics. No chorus, no verse labels, no intro — just the bars, ready to spit.
-The lines should rhyme (AABB or ABAB), have a consistent rap cadence, and roast "${subject}" DIRECTLY — its qualities, behavior, or vibe. Not people associated with it unless they are the subject.
-Use wordplay, punchlines, and clever references. Match the heat level — low heat means playful disses, high heat means savage bars.
-Never use slurs or genuinely hateful content. Output only the lyrics, nothing else.`;
+
+Write 8-10 lines of lyrics. Rules:
+- Rhyme scheme: AABB or ABAB. Every rhyme must actually rhyme — don't force it.
+- Syllables matter. Each line should have a natural, speakable rhythm — read it aloud in your head and make sure it flows. No line should feel cramped or awkward.
+- Write in plain, clear English. No rap slang, no dropped g's (talkin', runnin'), no apostrophe contractions used to fake a rhythm (it's fine to use normal contractions like "don't" or "can't").
+- Don't try to sound cool or street. Sound clever and funny instead.
+- Roast "${subject}" directly — its qualities, behavior, appearance, or vibe. Be specific and creative.
+- Match the heat level: low heat = playful teasing, high heat = savage but still witty.
+- No slurs, no genuinely hateful content.
+- Output only the lyrics. No title, no labels, no explanation.`;
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
