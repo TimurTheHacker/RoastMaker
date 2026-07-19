@@ -87,8 +87,9 @@ Heat level: ${heatVal}/100 — ${buildToneDesc(heatVal)}.
 
 Write 8-10 lines of lyrics. Rules:
 - Rhyme scheme: AABB or ABAB. Every rhyme must actually rhyme — don't force it.
-- Syllables matter. Each line should have a natural, speakable rhythm — read it aloud in your head and make sure it flows. No line should feel cramped or awkward.
-- Write in plain, clear English. No rap slang, no dropped g's (talkin', runnin'), no apostrophe contractions used to fake a rhythm (it's fine to use normal contractions like "don't" or "can't").
+- Keep each line to 8-12 syllables max. Count the syllables before finalizing each line. If a line feels too long to say in one breath at a moderate rap pace, cut it down.
+- Aim for a consistent beat — lines within a couplet should have similar syllable counts so they feel balanced when spoken.
+- Write in plain, clear English. No rap slang, no dropped g's (talkin', runnin'), no apostrophe contractions used to fake a rhythm. Normal contractions like "don't" and "can't" are fine.
 - Don't try to sound cool or street. Sound clever and funny instead.
 - Roast "${subject}" directly — its qualities, behavior, appearance, or vibe. Be specific and creative.
 - Match the heat level: low heat = playful teasing, high heat = savage but still witty.
