@@ -1,7 +1,7 @@
 export const config = { runtime: 'edge' };
 
-function buildSystemPrompt(heat, mode, subject) {
-  const toneDesc =
+function buildToneDesc(heat) {
+  return (
     heat === 0  ? "you are basically complimenting them — find the tiniest, most affectionate thing to tease, nothing edgy whatsoever" :
     heat <= 10  ? "extremely gentle and wholesome — warm teasing only, like a grandparent poking fun, nothing that could sting even slightly" :
     heat <= 25  ? "very light and warm — like a close friend giving a soft tease over coffee, always kind underneath" :
@@ -9,7 +9,12 @@ function buildSystemPrompt(heat, mode, subject) {
     heat <= 55  ? "punchy stand-up energy — real comedic bite, clever and a little sharp, like a roast dinner set" :
     heat <= 70  ? "sharp and pointed — Comedy Central roast vibes, pulling fewer punches, wit over cruelty" :
     heat <= 85  ? "savage and relentless — brutal jokes with creative wordplay and pop-culture references, devastating but never hateful" :
-                  "absolutely merciless — legendary roast master energy, maximum wit and venom, like the closing act of a roast battle finale";
+                  "absolutely merciless — legendary roast master energy, maximum wit and venom, like the closing act of a roast battle finale"
+  );
+}
+
+function buildSystemPrompt(heat, mode, subject) {
+  const toneDesc = buildToneDesc(heat);
 
   const styleNotes =
     heat <= 15  ? "Very slight stings are okay — think a tiny pinch, not a punch. Nothing that could offend anyone or be taken badly. Keep it universally likeable." :
@@ -65,6 +70,33 @@ export default async function handler(req) {
         max_tokens: 150,
         system: buildSystemPrompt(heatVal, 'battle', null),
         messages,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) return new Response(JSON.stringify({ error: data?.error?.message || 'API error' }), { status: res.status, headers: { 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify({ roast: data.content?.[0]?.text || '...' }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  }
+
+  if (mode === 'diss') {
+    if (!subject) {
+      return new Response(JSON.stringify({ error: 'Missing subject.' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    const dissPrompt = `You are a legendary hip-hop ghostwriter. Write a diss track about: "${subject}".
+Heat level: ${heatVal}/100 — ${buildToneDesc(heatVal)}.
+Format: exactly 8-10 lines of rap lyrics. No chorus, no verse labels, no intro — just the bars, ready to spit.
+The lines should rhyme (AABB or ABAB), have a consistent rap cadence, and roast "${subject}" DIRECTLY — its qualities, behavior, or vibe. Not people associated with it unless they are the subject.
+Use wordplay, punchlines, and clever references. Match the heat level — low heat means playful disses, high heat means savage bars.
+Never use slurs or genuinely hateful content. Output only the lyrics, nothing else.`;
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 400,
+        system: dissPrompt,
+        messages: [{ role: 'user', content: 'Write the diss track now.' }],
       }),
     });
     const data = await res.json();
