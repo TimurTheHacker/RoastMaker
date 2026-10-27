@@ -1,5 +1,14 @@
 export const config = { runtime: 'edge' };
 
+// Newer models can return thinking blocks before the text, so collect only the text blocks.
+function extractText(data) {
+  return (data.content || [])
+    .filter(block => block.type === 'text')
+    .map(block => block.text)
+    .join('')
+    .trim();
+}
+
 function buildToneDesc(heat) {
   return (
     heat === 0  ? "you are basically complimenting them — find the tiniest, most affectionate thing to tease, nothing edgy whatsoever" :
@@ -67,14 +76,16 @@ export default async function handler(req) {
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
         model: 'claude-sonnet-5-5',
-        max_tokens: 150,
+        max_tokens: 500,
+        thinking: { type: 'adaptive' },
+        output_config: { effort: 'low' },
         system: buildSystemPrompt(heatVal, 'battle', null),
         messages,
       }),
     });
     const data = await res.json();
     if (!res.ok) return new Response(JSON.stringify({ error: data?.error?.message || 'API error' }), { status: res.status, headers: { 'Content-Type': 'application/json' } });
-    return new Response(JSON.stringify({ roast: data.content?.[0]?.text || '...' }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify({ roast: extractText(data) || '...' }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   }
 
   if (mode === 'ragebait') {
@@ -129,14 +140,16 @@ Rules:
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
         model: 'claude-sonnet-5-5',
-        max_tokens: 150,
+        max_tokens: 500,
+        thinking: { type: 'adaptive' },
+        output_config: { effort: 'low' },
         system: ragebaitSystem,
         messages,
       }),
     });
     const data = await res.json();
     if (!res.ok) return new Response(JSON.stringify({ error: data?.error?.message || 'API error' }), { status: res.status, headers: { 'Content-Type': 'application/json' } });
-    return new Response(JSON.stringify({ roast: data.content?.[0]?.text || '...' }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify({ roast: extractText(data) || '...' }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   }
 
   // single roast mode
@@ -149,12 +162,14 @@ Rules:
     headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
     body: JSON.stringify({
       model: 'claude-sonnet-5-5',
-      max_tokens: 400,
+      max_tokens: 500,
+      thinking: { type: 'adaptive' },
+      output_config: { effort: 'low' },
       system: buildSystemPrompt(heatVal, 'single', subject),
       messages: [{ role: 'user', content: 'Generate the roasts now.' }],
     }),
   });
   const data = await res.json();
   if (!res.ok) return new Response(JSON.stringify({ error: data?.error?.message || 'API error' }), { status: res.status, headers: { 'Content-Type': 'application/json' } });
-  return new Response(JSON.stringify({ roast: data.content?.[0]?.text || 'They are unroastable.' }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  return new Response(JSON.stringify({ roast: extractText(data) || 'They are unroastable.' }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 }
