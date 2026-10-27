@@ -461,6 +461,38 @@
     .error-msg { color: #ff6b6b; font-size: 0.82rem; margin-top: 0.6rem; display: none; }
     .error-msg.visible { display: block; }
 
+    /* ── RAGEBAIT OVERRIDES ── */
+    .ragebait-intro { color: #c0392b; font-weight: 500; }
+
+    .ragebait-window {
+      background: #110808;
+      border-color: rgba(180, 30, 30, 0.35);
+      box-shadow: 0 0 24px rgba(160, 20, 20, 0.18) inset;
+    }
+
+    /* ragebait AI bubble — cold, clinical */
+    #ragebaitMode .bubble.ai {
+      background: #1a0f0f;
+      border-color: rgba(180, 30, 30, 0.3);
+      color: #e8d8d8;
+    }
+
+    /* ragebait user bubble — sickly yellow-green rage energy */
+    #ragebaitMode .bubble.user {
+      background: linear-gradient(135deg, rgba(180,30,30,0.22), rgba(100,10,10,0.22));
+      border-color: rgba(180,30,30,0.3);
+    }
+
+    /* ragebait speaker label — blood red */
+    #ragebaitMode .bubble.ai .speaker { color: #c0392b; }
+
+    /* ragebait tab — when active, glow red */
+    #modeRagebait.active {
+      background: rgba(160, 20, 20, 0.55) !important;
+      color: #ff6b6b !important;
+      box-shadow: 0 0 8px rgba(200, 30, 30, 0.4) !important;
+    }
+
     /* ── FOOTER ── */
     footer { margin-top: 1.75rem; font-size: 0.76rem; color: var(--muted); text-align: center; max-width: 480px; line-height: 1.6; }
   </style>
@@ -478,7 +510,7 @@
   <div class="mode-toggle">
     <button id="modeRoast" class="active" onclick="setMode('roast')">🎯 Roast Generator</button>
     <button id="modeBattle" onclick="setMode('battle')">🥊 Roast Battle</button>
-    <button id="modeRagebait" onclick="setMode('ragebait')">😇 Ragebait</button>
+    <button id="modeRagebait" onclick="setMode('ragebait')">😈 Ragebait</button>
   </div>
 
   <!-- HEAT SLIDER (shared) -->
@@ -512,10 +544,10 @@
 
   <!-- RAGEBAIT MODE -->
   <div id="ragebaitMode" style="display:none">
-    <p class="battle-intro">Try your hardest to make the AI angry. It won't work. 😇</p>
-    <div class="chat-window" id="ragebaitWindow">
+    <p class="battle-intro ragebait-intro">Try your absolute worst. The AI will not react. 😈</p>
+    <div class="chat-window ragebait-window" id="ragebaitWindow">
       <div class="chat-empty" id="ragebaitEmpty">
-        <span class="big">😇</span>
+        <span class="big">😈</span>
         Say something terrible. See what happens.
       </div>
     </div>
@@ -775,7 +807,7 @@
   function clearRagebait() {
     ragebaitMessages = [];
     const win = document.getElementById('ragebaitWindow');
-    win.innerHTML = `<div class="chat-empty" id="ragebaitEmpty"><span class="big">😇</span>Say something terrible. See what happens.</div>`;
+    win.innerHTML = `<div class="chat-empty" id="ragebaitEmpty"><span class="big">😈</span>Say something terrible. See what happens.</div>`;
   }
 
   function copyRagebait() {
