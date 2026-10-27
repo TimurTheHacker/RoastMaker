@@ -9,6 +9,11 @@ function extractText(data) {
     .trim();
 }
 
+// Added to every system prompt so thinking stays short and leaves room for the reply.
+const THINK_BRIEFLY = `
+
+Before replying, think only briefly — a few short sentences at most. Do not draft or rewrite the full reply in your thinking. Save your words for the reply itself.`;
+
 function buildToneDesc(heat) {
   return (
     heat === 0  ? "you are basically complimenting them — find the tiniest, most affectionate thing to tease, nothing edgy whatsoever" :
@@ -76,10 +81,10 @@ export default async function handler(req) {
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
         model: 'claude-sonnet-5-5',
-        max_tokens: 500,
+        max_tokens: 700,
         thinking: { type: 'adaptive' },
         output_config: { effort: 'low' },
-        system: buildSystemPrompt(heatVal, 'battle', null),
+        system: buildSystemPrompt(heatVal, 'battle', null) + THINK_BRIEFLY,
         messages,
       }),
     });
@@ -140,10 +145,10 @@ Rules:
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
         model: 'claude-sonnet-5-5',
-        max_tokens: 500,
+        max_tokens: 700,
         thinking: { type: 'adaptive' },
         output_config: { effort: 'low' },
-        system: ragebaitSystem,
+        system: ragebaitSystem + THINK_BRIEFLY,
         messages,
       }),
     });
@@ -162,10 +167,10 @@ Rules:
     headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
     body: JSON.stringify({
       model: 'claude-sonnet-5-5',
-      max_tokens: 500,
+      max_tokens: 700,
       thinking: { type: 'adaptive' },
       output_config: { effort: 'low' },
-      system: buildSystemPrompt(heatVal, 'single', subject),
+      system: buildSystemPrompt(heatVal, 'single', subject) + THINK_BRIEFLY,
       messages: [{ role: 'user', content: 'Generate the roasts now.' }],
     }),
   });
