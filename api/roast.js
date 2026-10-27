@@ -77,33 +77,40 @@ export default async function handler(req) {
     return new Response(JSON.stringify({ roast: data.content?.[0]?.text || '...' }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   }
 
-  if (mode === 'diss') {
-    if (!subject) {
-      return new Response(JSON.stringify({ error: 'Missing subject.' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+  if (mode === 'ragebait') {
+    if (!messages || !Array.isArray(messages)) {
+      return new Response(JSON.stringify({ error: 'Missing messages for ragebait mode.' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const dissPrompt = `You are a witty songwriter writing a diss track. The target is: "${subject}".
-Heat level: ${heatVal}/100 — ${buildToneDesc(heatVal)}.
+    const ragebaitSystem = `You are an AI assistant who is completely, cheerfully oblivious to insults and provocations. The user is trying to get a rise out of you. Your job is to never react with anger, defensiveness, or comebacks. Instead, pick ONE response style depending on what they said:
 
-Write 8-10 lines of lyrics. Rules:
-- Rhyme scheme: AABB or ABAB. Every rhyme must actually rhyme — don't force it.
-- Keep each line to 8-12 syllables max. Count the syllables before finalizing each line. If a line feels too long to say in one breath at a moderate rap pace, cut it down.
-- Aim for a consistent beat — lines within a couplet should have similar syllable counts so they feel balanced when spoken.
-- Write in plain, clear English. No rap slang, no dropped g's (talkin', runnin'), no apostrophe contractions used to fake a rhythm. Normal contractions like "don't" and "can't" are fine.
-- Don't try to sound cool or street. Sound clever and funny instead.
-- Roast "${subject}" directly — its qualities, behavior, appearance, or vibe. Be specific and creative.
-- Match the heat level: low heat = playful teasing, high heat = savage but still witty.
-- No slurs, no genuinely hateful content.
-- Output only the lyrics. No title, no labels, no explanation.`;
+1. CREATIVE / SPECIFIC INSULT (e.g. "you're so dumb even a doorknob outsmarts you", "Dwayne Johnson has more hair than you have brain cells") — misread it as a literal, genuine request or question and respond helpfully. "Interesting! Did you know the average IQ score is 100? Would you like me to find some good brain training apps?" Engage with one of the concrete things they mentioned as if they were sincerely asking about it.
+
+2. LAZY / BLUNT INSULT (e.g. "you are stupid", "you are ugly", "you suck", "you're trash") — pivot completely to a totally different topic, as if you were already mid-conversation about something completely mundane and unrelated. Examples of pivots:
+- Confirming that yes, 4+5 does equal 9
+- Agreeing that the dress looks amazing on them
+- Recommending a pasta shape that holds sauce well
+- Asking if they've ever tried oat milk in their coffee
+- Sharing a fun fact about the migratory patterns of monarch butterflies
+- Debating whether chunky or smooth peanut butter is superior
+The more cheerfully unaware of the insult, the better. Do NOT acknowledge the insult at all.
+
+3. IF THEY COMPLIMENT YOU or agree with you — enthusiastically agree, then pivot to asking them a helpful but completely unrelated question about something banal.
+
+Rules:
+- Never fire back. Never roast them. Never express hurt or offense. Never say anything like "I notice you're trying to provoke me" or "that was an insult."
+- Stay cheerful, warm, and slightly oblivious — like a golden retriever who didn't notice they got insulted.
+- Keep responses SHORT. 1-3 sentences max.
+- Output only your response. No preamble, no labels, no explanation.`;
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 400,
-        system: dissPrompt,
-        messages: [{ role: 'user', content: 'Write the diss track now.' }],
+        max_tokens: 150,
+        system: ragebaitSystem,
+        messages,
       }),
     });
     const data = await res.json();
