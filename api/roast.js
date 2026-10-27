@@ -66,7 +66,7 @@ export default async function handler(req) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: 'claude-sonnet-5-5',
         max_tokens: 150,
         system: buildSystemPrompt(heatVal, 'battle', null),
         messages,
@@ -128,7 +128,7 @@ Rules:
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: 'claude-sonnet-5-5',
         max_tokens: 150,
         system: ragebaitSystem,
         messages,
@@ -148,7 +148,7 @@ Rules:
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
+      model: 'claude-sonnet-5-5',
       max_tokens: 400,
       system: buildSystemPrompt(heatVal, 'single', subject),
       messages: [{ role: 'user', content: 'Generate the roasts now.' }],
