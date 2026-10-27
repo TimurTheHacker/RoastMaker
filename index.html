@@ -737,7 +737,7 @@
     const win = document.getElementById('ragebaitWindow');
     const b = document.createElement('div');
     b.className = 'bubble ' + (role === 'user' ? 'user' : 'ai');
-    b.innerHTML = `<div class="speaker">${role === 'user' ? 'You' : 'Roast Master'}</div>${escHtml(text)}`;
+    b.innerHTML = `<div class="speaker">${role === 'user' ? 'You' : 'Zen Master'}</div>${escHtml(text)}`;
     win.appendChild(b);
     win.scrollTop = win.scrollHeight;
     return b;
@@ -750,7 +750,7 @@
     const win = document.getElementById('ragebaitWindow');
     const b = document.createElement('div');
     b.className = 'bubble ai typing';
-    b.innerHTML = `<div class="speaker">Roast Master</div><span class="dots"><span></span><span></span><span></span></span>`;
+    b.innerHTML = `<div class="speaker">Zen Master</div><span class="dots"><span></span><span></span><span></span></span>`;
     win.appendChild(b);
     win.scrollTop = win.scrollHeight;
     return b;
@@ -812,7 +812,7 @@
 
   function copyRagebait() {
     const lines = ragebaitMessages.map(m =>
-      (m.role === 'user' ? 'You' : 'Roast Master') + ': ' + m.content
+      (m.role === 'user' ? 'You' : 'Zen Master') + ': ' + m.content
     ).join('\n\n');
     if (!lines) return;
     navigator.clipboard.writeText(lines).then(() => {
